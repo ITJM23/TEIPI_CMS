@@ -168,8 +168,8 @@
 
                                     <!-- ================== Manual Searching of Employee ===================== -->
                                     
-                                    <!--<button type="button" class="btn btn-light" onclick="searchEmp()" id="searchBtn"><span class="fa fa-user"></span></button>  
-                                    <button type="button" class="btn btn-light" onclick="searchEmp()" id="searchBtn" disabled><span class="fa fa-user"></span></button>-->
+                                    <button type="button" class="btn btn-light" onclick="searchEmp()" id="searchBtn"><span class="fa fa-user"></span></button>  
+                                    <button type="button" class="btn btn-light" onclick="searchEmp()" id="searchBtn" disabled><span class="fa fa-user"></span></button>
                                     
                                     <!-- ================== Manual Searching of Employee END ================= -->
 

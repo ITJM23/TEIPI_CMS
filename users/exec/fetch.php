@@ -252,7 +252,13 @@
 
         else if($_POST['action'] == 'gnrt_trans_Id'){
 
-            $currdate = md5(date(strtotime("now")).$user_Id);
+            $datenow = date('YmdHis');
+            $idmaking = md5(date(strtotime("now")).$user_Id);
+            $currdate = $idmaking . $datenow;
+
+            //edit id making jm
+
+            
 
             $arr = array('TransId' => $currdate, 'TransId2' => substr($currdate, 0,10), 'UserId' => $user_Id);
 
@@ -867,7 +873,7 @@
 
         
 
-        else if($_POST['action'] == 'orders_tbl'){
+        else if($_POST['action'] == 'orders_tbl'){ //jm
 
             if(isset($_POST['transid'])){
 
