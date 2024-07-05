@@ -72,7 +72,7 @@
                 </ul>
 
             <li class="sidebar-header">SHORTCUTS</li>
-            <li><a href="front_display.php" target="_blank"><i class="fa-solid fa-tv"></i>POS Display</span></a></li>
+            <li><a href="front_display_cookie.php" target="_blank"><i class="fa-solid fa-tv"></i>POS Display</span></a></li>
 
             <?php
 

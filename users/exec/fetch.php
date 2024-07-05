@@ -267,7 +267,7 @@
 
 
 
-        else if($_POST['action'] == 'get_cart_orders'){
+        else if($_POST['action'] == 'get_cart_orders'){ //jm
 
             if(isset($_POST['transid'])){
 
@@ -277,7 +277,9 @@
                             trans_details.Trans_det_Id, 
                             trans_details.Quantity, 
                             items.Item_name, 
-                            items.Price ";
+                            items.Cat_Id,
+                            items.Price,
+                            items.Item_Id ";
 
                 $query .="FROM 
                             trans_details 
@@ -308,13 +310,17 @@
                             $trans_Id   = $row['Trans_det_Id'];
                             $item_name  = $row['Item_name'];
                             $item_qty   = $row['Quantity'];
+                            $Cat_Id     = $row['Cat_Id'];
                             $item_price = $row['Price'];
+                            $Item_Id    = $row['Item_Id'];
 
                             $order_arr = array(
                                 'Trans_Id' => $trans_Id,
                                 'Item_name' => $item_name,
                                 'Item_qty' => $item_qty,
-                                'Item_price' => number_format($item_price)
+                                'Cat_Id'   => $Cat_Id,
+                                'Item_price' => number_format($item_price),
+                                'Item_Id' => $Item_Id
                             );
 
                             array_push($orders_arr, $order_arr);
@@ -328,6 +334,7 @@
                     }
 
                     echo json_encode($orders_arr);
+                    
                 }
             }
         }
@@ -535,7 +542,7 @@
 
                 $trans_Id = $_POST['transid'];
 
-                $query = "SELECT trans_disc.Trans_D_Id, discounts.Disc_name ";
+                $query = "SELECT trans_disc.Trans_D_Id, discounts.Disc_name, Disc_amount ";
                 $query .="FROM trans_disc LEFT JOIN discounts ";
                 $query .="ON trans_disc.Disc_Id = discounts.Disc_Id ";
                 $query .="WHERE trans_disc.Trans_Id = '$trans_Id' ";
@@ -552,10 +559,12 @@
 
                         $trans_d_Id = $row['Trans_D_Id'];
                         $disc_name  = $row['Disc_name'];
+                        $Disc_amount = $row['Disc_amount'];
 
                         $selected_disc = array(
                             'Trans_D_Id' => $trans_d_Id,
-                            'Disc_name' => $disc_name
+                            'Disc_name' => $disc_name,
+                            'Disc_amount' => $Disc_amount
                         );
 
                         array_push($selected_discs, $selected_disc);

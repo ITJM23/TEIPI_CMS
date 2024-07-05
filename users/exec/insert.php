@@ -172,7 +172,7 @@
 
                 else{
 
-                    $the_date = date('Y-m-d', strtotime('now'));
+                    $the_date = date('Y-m-d', strtotime('now')); // JM DATE
                 }
 
 

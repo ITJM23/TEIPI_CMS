@@ -157,7 +157,7 @@
                             <div class="card-body">
 
                                 <span class="fa fa-user mr-3"></span>
-                                <a href="" id="cust_name">Add Customer</a> <!--jm-->
+                                <a href="" id="cust_name">Add Customer</a> 
                                 <span class="p-2"id="credit_stat"></span>
                             
                                 <br><br>
@@ -514,6 +514,8 @@
 
         $(document).ready(function(){
 
+            
+
             getTranscID()
             
             $('#qr_code_val').focus()
@@ -527,6 +529,15 @@
             getCartOrders('order_list')
 
             catTabs('cat_tab')
+
+            setInterval(Disable30Disc, 1000); //jm
+            //document.addEventListener('click', Disable30Disc());
+            //setInterval(FrontDisplayCookies, 1000);
+
+
+
+        
+
 
 
             $('#qr_code_val').on('keyup', function(e){
@@ -554,7 +565,7 @@
                                 $('#barcode_val').prop('disabled', false)
                                 $('#i_search_val').prop('disabled', false)
 
-                                $('#cust_name').html(response.FullName) //jm 
+                                $('#cust_name').html(response.FullName) 
                                 creditChckr(response.EmpId)
 
                                 newTransc()
@@ -595,7 +606,7 @@
                 var trans_Id    = $('#trans_Id').val()
                 var g_total     = $('#g_total').html()
                 var data        = $('#payCashForm').serializeArray()
-
+                //
                 // if(g_total < 0){
 
                 //     g_total = 0
@@ -617,7 +628,7 @@
                         if(response == '1'){
 
                             setTimeout(function(){
-
+                                clearCookies();
                                 location.href='pos.php'
 
                             }, 1000)
@@ -647,7 +658,7 @@
 
 
 
-        async function itemList(id, cat_id, search_val){
+        async function itemList(id, cat_id, search_val){ //jm
 
             var output=''
 
@@ -685,9 +696,14 @@
                     }
 
                     $('#'+id).html(output)
+                    
                 }
             })
+
+            
         }
+
+
 
 
 
@@ -727,6 +743,10 @@
                     
                     $('#cust_name').html(response.FullName)
                     creditChckr(response.EmpId)
+                    setCookie('CUST_NAME', response.FullName, 30);
+
+                   
+
 
                     newTransc()
                 }
@@ -735,6 +755,14 @@
 
         }
 
+        function setCookie(cookieName, cookieValue, expirationDays) {
+            var d = new Date();
+            d.setTime(d.getTime() + (expirationDays * 24 * 60 * 60 * 1000));
+            var expires = "expires=" + d.toUTCString();
+            document.cookie = cookieName + "=" + cookieValue + ";" + expires + ";path=/";
+        }
+
+        
 
 
         function getTranscID(){
@@ -751,63 +779,86 @@
                     $('#trans_Id').val(response.TransId)
                     $('#trans_Id2').html("("+ response.TransId2 +")")
 
+                    setCookie('TRANS_ID', response.TransId2, 30);
+
                 }
             })
         }
 
         
 
+        
+        //let disableButtonFlag = false; // Flag to check if we need to disable the button
         // ================== Cart Functions =======================
-            async function getCartOrders(id){
+      async function getCartOrders(id) {
+    var output = '';
+    var ITEM_NAME = [];
+    var ITEM_ID = [];
+    var ITEM_QTY = [];
+    var ITEM_PRICE = [];
 
-                var output =''
+    var trans_Id = $('#trans_Id').val();
 
-                var trans_Id = $('#trans_Id').val()
-
-                await $.ajax({
-                    type: "POST",
-                    url: "exec/fetch.php",
-                    data: {
-                        transid:trans_Id,
-                        action:"get_cart_orders"
-                    },
-                    dataType: "JSON",
-                    success: function (response) {
-
-                        if(response.length > 0){
-
-                            $.each(response, function(key, value){
-    
-                                output+='<div class="d-flex align-items-center" style="justify-content: space-between;">';
-                                output+='<div>';
-                                output+='<h5>'+ value.Item_name +'</h5>';
-                                output+='<p><b>P'+ value.Item_price +'</b></p>';
-                                output+='</div>';
-                                output+='<div class="d-flex align-tems-center">';
-                                output+='<span class="fa fa-minus ml-2 p-2" style="border-radius: 100%; border: 2px solid #fff;" onclick="minusQty(`'+ value.Trans_Id +'`)"></span>';
-                                output+='<h4 class="mr-3 ml-3">'+ value.Item_qty +'</h4>';
-                                output+='<span class="fa fa-plus mr-2 p-2" style="border-radius: 100%; border: 2px solid #fff;" onclick="plusQty(`'+ value.Trans_Id +'`)"></span>';
-                                output+='</div>';
-                                output+='</div><hr>';
-                            })
-                        }
-
-                        else{
-
-                            output+='<div class="text-center">';
-                            output+='<h5>No Results</h5>';
-                            output+='</div>';
-                        }
-
-                        
-                        $('#'+id).html(output)
+    await $.ajax({
+        type: "POST",
+        url: "exec/fetch.php",
+        data: {
+            transid: trans_Id,
+            action: "get_cart_orders"
+        },
+        dataType: "JSON",
+        success: function (response) {
+            if (response.length > 0) {
+                $.each(response, function (key, value) {
+                    output += '<div class="d-flex align-items-center" style="justify-content: space-between;">';
+                    output += '<div>';
+                    output += '<h5>' + value.Item_name + '</h5>';
+                    output += '<p><b>P' + value.Item_price + '</b></p>';
+                    if (value.Cat_Id == 44) {
+                        output += '<p>Disc available</p>';
                     }
-                })
+                    output += '</div>';
+                    output += '<div class="d-flex align-items-center">'; // Corrected typo here
+                    output += '<span class="fa fa-minus ml-2 p-2" style="border-radius: 100%; border: 2px solid #fff;" onclick="minusQty(`' + value.Trans_Id + '`)"></span>';
+                    output += '<h4 class="mr-3 ml-3">' + value.Item_qty + '</h4>';
+                    output += '<span class="fa fa-plus mr-2 p-2" style="border-radius: 100%; border: 2px solid #fff;" onclick="plusQty(`' + value.Trans_Id + '`)"></span>';
+                    output += '</div>';
+                    output += '</div><hr>';
+
+                    ITEM_NAME.push(value.Item_name);
+                    ITEM_ID.push(value.Item_Id);
+                    ITEM_QTY.push(value.Item_qty);
+                    ITEM_PRICE.push(value.Item_price);
+                });
+            } else {
+                output += '<div class="text-center">';
+                output += '<h5>No Results</h5>';
+                output += '</div>';
             }
 
+            setCookie('ITEM_NAME', ITEM_NAME, 30);
+            setCookie('ITEM_ID', ITEM_ID, 30);
+            setCookie('ITEM_QTY', ITEM_QTY, 30);
+            setCookie('ITEM_PRICE', ITEM_PRICE, 30);
+
+            $('#' + id).html(output);
+        }
+    });
+}
 
 
-            async function addToCart(item_id){
+
+
+
+
+            //========================================================
+           
+
+            //========================================================
+
+
+
+            async function addToCart(item_id){ //jm
 
                 var trans_Id = $('#trans_Id').val()
                 var emp_dd   = $('#qr_code_val').val()
@@ -857,6 +908,8 @@
                         }
                     }
                 })
+
+            
             }
 
 
@@ -956,7 +1009,7 @@
 
 
             function voidTrans(){
-
+                
                 var trans_Id = $('#trans_Id').val()
 
                 $.ajax({
@@ -970,8 +1023,9 @@
                     success: function (response) {
                         
                         if(response == '1'){
-
+                            clearCookies();
                             location.href='pos.php'
+
                         }
 
                         else if(response == '2'){
@@ -1006,6 +1060,9 @@
                         $('#'+id).html(response)
                         $('#g_total').html(response)
                         $('#g_total_val').val(response)
+
+                        setCookie('Grand_Total', response, 30);
+
 
                         if(response == 0 || response == ''){
 
@@ -1091,34 +1148,55 @@
                 })
             }
 
+            function Disable30Disc() { // jm
+                const orderListDiv = document.getElementById('order_list');
+                const button = document.getElementById('disc_1');
 
-
-            async function getDiscounts(id){
-
-                var output=''
-
-                var emp_dd = $('#qr_code_val').val()
-
-                await $.ajax({
-                    type: "POST",
-                    url: "exec/fetch.php",
-                    data: {
-                        emphash:emp_dd,
-                        action:"get_discounts"
-                    },
-                    dataType: "JSON",
-                    success: function (response) {
-                        
-                        $.each(response, function(key, value){
-                            
-                            output+='<button type="button" class="btn btn-light p-3 dics_btn" onclick="useDisc(`'+ value.Disc_Id +'`)">'+ value.Disc_name +' ('+ value.Avail_disc +')</button> ';
-                        })
-                        
-                        $('#'+id).html(output)
-
-                    }
-                })
+                if (orderListDiv && orderListDiv.textContent.includes('Disc available')) {
+                    // Enable the button
+                    button.disabled = false;
+                } else {
+                    button.disabled = true;
+                }
             }
+
+
+
+                
+           
+
+
+    async function getDiscounts(id){ 
+    var output = ''
+    var emp_dd = $('#qr_code_val').val()
+
+    await $.ajax({
+        type: "POST",
+        url: "exec/fetch.php",
+        data: {
+            emphash: emp_dd,
+            action: "get_discounts"
+        },
+        dataType: "JSON",
+        success: function (response) {
+            $.each(response, function(key, value){
+                // Check if Disc_Id is 1 jm
+                if (value.Disc_Id == 1) {
+                    output += '<button type="button" id="disc_' + value.Disc_Id + '" class="btn btn-light p-3 dics_btn" onclick="useDisc(`'+ value.Disc_Id +'`)" disabled>' + value.Disc_name + ' (' + value.Avail_disc + ')</button>';
+                } else {
+                    output += '<button type="button" id="disc_' + value.Disc_Id + '" class="btn btn-light p-3 dics_btn" onclick="useDisc(`'+ value.Disc_Id +'`)">' + value.Disc_name + ' (' + value.Avail_disc + ')</button>';
+                }
+
+
+            })
+            
+            $('#'+id).html(output)
+        }
+    })
+}
+
+
+            
 
             
 
@@ -1127,6 +1205,8 @@
                 var output=''
 
                 var trans_Id = $('#trans_Id').val()
+                var arrdiscounts = [];
+                var arrDisc_amount = [];
 
                 $.ajax({
                     type: "POST",
@@ -1141,7 +1221,14 @@
                         $.each(response, function(key, value){
 
                             output+='<button type="button" class="btn bg-dark btn-outline-danger" onclick="deleteDisc(`'+ value.Trans_D_Id +'`)">'+ value.Disc_name +'</button> '
+                            arrdiscounts.push(value.Disc_name);
+                            arrDisc_amount.push(value.Disc_amount);
+
                         })
+
+                        setCookie('DISCOUNTS', arrdiscounts, 30);
+                        setCookie('Disc_amount', arrDisc_amount, 30);
+
 
                         $('#'+id).html(output)
                     }   
@@ -1236,9 +1323,9 @@
                                 if(response == '1'){
 
                                     setTimeout(function(){
-
+                                        clearCookies();
                                         location.href='pos.php'
-
+                                        
                                     }, 1000)
 
                                 }
@@ -1268,7 +1355,7 @@
 
 
 
-        async function catTabs(id){
+        async function catTabs(id){ //jm
 
             var output =''
 
@@ -1367,6 +1454,18 @@
                     }
                 }
             })
+        }
+
+        function clearCookies() {
+            setCookie('CUST_NAME', '', -1);
+            setCookie('TRANS_ID', '', -1);
+            setCookie('Grand_Total', '', -1);
+            setCookie('DISCOUNTS', '', -1);
+            setCookie('ITEM_NAME', '', -1);
+            setCookie('ITEM_ID', '', -1);
+            setCookie('ITEM_QTY', '', -1);
+            setCookie('ITEM_PRICE', '', -1);
+            
         }
 
 

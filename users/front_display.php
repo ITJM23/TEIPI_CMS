@@ -190,6 +190,9 @@
             }, 1000)
         })
 
+        
+
+
 
 
         function activeTransc(){
