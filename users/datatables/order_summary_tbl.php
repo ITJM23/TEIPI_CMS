@@ -5,7 +5,7 @@
 
     $column = array();
 
-    $query ="SELECT DISTINCT trans_details.Item_Id, transactions.Status, items.Item_name, items.Price, transactions.Date_added, transactions.Time_added, ";
+    $query ="SELECT DISTINCT trans_details.Item_Id, trans_details.Quantity, transactions.Status, items.Item_name, items.Price, transactions.Date_added, transactions.Time_added, "; //jm
     $query .="COUNT(trans_details.Item_Id) as Orders ";
     $query .="FROM trans_details ";
     $query .="LEFT JOIN transactions ";
@@ -75,6 +75,7 @@
         $item_price     = $row['Price'];
         $date_added     = $row['Date_added'];
         $time_added     = $row['Time_added'];
+        $item_quantity  = $row['Quantity']; //jm
 
         $total_orders   = $row['Orders'];
 
