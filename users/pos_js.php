@@ -560,6 +560,85 @@
         }
 
 
+
+        function empFetch(){
+
+            var emp_dd = $('#emp_dd').val()
+
+            $('#srchEmpMod').modal('hide') 
+
+            $('#qr_code_val').val(emp_dd)//working till here
+
+            // getDiscounts('discount_list')
+
+            //itemList('item_list', '', '') //causing error if itemlist is not yet called
+
+            $('#cat_tab').show()
+
+            $('#barcode_val').prop('disabled', false)
+            $('#i_search_val').prop('disabled', false)
+
+            $.ajax({
+                type: "POST",
+                url: "exec/fetch.php",
+                data: {
+                    emphash:emp_dd,
+                    action:"emp_info"
+                },
+                dataType: "JSON",
+                success: function (response) {
+                    
+                    $('#cust_name').html(response.FullName)
+                    creditChckr(response.EmpId)
+                    setCookie('CUST_NAME', response.FullName, 30);
+
+                
+
+
+                    newTransc()
+                }
+            })
+
+
+        }
+
+        async function creditChckr(emp_Id){
+
+// var emp_Id = $('#emp_id').val()
+
+await $.ajax({
+    type: "POST",
+    url: "exec/fetch.php",
+    data: {
+        empid:emp_Id,
+        action:"credit_chckr"
+    },
+    dataType: "JSON",
+    success: function (response) {
+        
+        if(response == '1'){
+
+            $('#credit_stat').attr('style', 'background:green; color:white; border-radius: 20px;')
+            $('#credit_stat').attr('class', 'fa fa-check p-1')
+
+            // $('#payCashBtn').prop('disabled', true)
+        }
+
+        else if(response == '0'){
+
+            $('#credit_stat').attr('style', 'background:red; color:white; border-radius: 20px;')
+            $('#credit_stat').attr('class', 'fa fa-close p-1')
+        }
+
+        else if(response == ''){
+
+            $('#credit_stat').attr('style', 'background:red; color:white; border-radius: 20px;')
+        }
+    }
+})
+}
+
+
     </script>
 
     
